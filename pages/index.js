@@ -151,7 +151,7 @@ export default function Home() {
           <InputLeftElement
             h='50px'
             w='50px'
-            children={<MdSearch />}
+            children={<MdSearch />}   // eslint-disable-line
             rounded='3xl'
             fontSize='130%'
           />
@@ -166,7 +166,7 @@ export default function Home() {
           <InputRightElement
             h='50px'
             w='50px'
-            children={<MdSettingsVoice />}
+            children={<MdSettingsVoice />}    // eslint-disable-line
             rounded='3xl'
             fontSize='130%'
           />
