@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Head from 'next/head'
 import {
   InputRightElement,
@@ -9,6 +10,14 @@ import {
   Box,
   Flex,
   Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
 } from "@chakra-ui/react"
 import {
   MdSettingsVoice,
@@ -16,6 +25,46 @@ import {
   MdAdd,
 } from 'react-icons/md';
 import styles from '../styles/Home.module.css'
+
+const AddLinkModal = ({ isOpen, onClose, onAdd }) => {
+  const [name, setName] = useState('');
+  const [url, setUrl] = useState('');
+
+  const handleAdd = () => {
+    setName('');
+    setUrl('');
+    onAdd(name, url);
+  }
+
+  return (
+    <Modal isOpen={ isOpen } onClose={ onClose }>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Add Shortcut</ModalHeader>
+        <ModalBody>
+          <Input
+            size="md"
+            h='40px'
+            placeholder="site name"
+            m='10px 0'
+            value={ name }
+            onChange={ e => setName(e.target.value) }
+          />
+          <Input
+            size="md"
+            h='40px'
+            placeholder="site url"
+            m='10px 0'
+            value={ url }
+            onChange={ e => setUrl(e.target.value) }
+          />
+          <Button m='20px 5px' onClick={ handleAdd }>OK</Button>
+          <Button m='20px 5px' onClick={ onClose }>Cancel</Button>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+};
 
 const sanitizeUrl = url => {
   return url.startsWith('https://')
@@ -42,7 +91,7 @@ const Tile = ({ url, name, icon, onClick = dummyFn }) => (
       <Image
         height="10"
         width="10"
-        src={sanitizeUrl(`${url}/favicon.ico`)}
+        src={ sanitizeUrl(`${url}/favicon.ico`) }
         alt='tileImage'
       />
     }
@@ -53,17 +102,40 @@ const Tile = ({ url, name, icon, onClick = dummyFn }) => (
   </Flex>
 );
 
+const initUrls = [
+  { url: "github.com", name: 'github' },
+  { url: "google.com", name: 'google' },
+  { url: "baidu.com", name: 'baidu' },
+  { url: "leetcode-cn.com", name: 'leetcode' },
+  { url: "https://edu.lagou.com", name: '拉钩' },
+  { url: "developer.mozilla.org", name: 'MDN' },
+  { url: "https://stackoverflow.com", name: 'stackoverflow' },
+  { url: "taobao.com", name: 'taobao' },
+  { url: "qq.com", name: 'QQ' },
+];
+
 export default function Home() {
-  const openModal = () => {
-    console.log('!!!');
+  const [isOpen, setIsOpen] = useState(false);
+  const [allUrl, setAllUrl] = useState(initUrls);
+
+  const handleAddUrl = (name, url) => {
+    setAllUrl([...allUrl, { name, url }]);
+    setIsOpen(false);
   }
+
   return (
     <div className={ styles.container }>
       <Head>
-        <title>Create Next App</title>
+        <title>Next Google Page</title>
         <meta name="description" content="Google Index Page Simulate with Nextjs" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="https://www.google.com/favicon.ico" />
       </Head>
+
+      <AddLinkModal
+        isOpen={ isOpen }
+        onClose={ () => setIsOpen(false) }
+        onAdd={ handleAddUrl } 
+      />
 
       <main className={ styles.main }>
         <Image
@@ -107,16 +179,15 @@ export default function Home() {
           flexWrap='wrap'
           paddingTop="20px"
         >
-          <Tile url="github.com" name='github' />
-          <Tile url="google.com" name='google'/>
-          <Tile url="baidu.com" name='baidu'/>
-          <Tile url="leetcode-cn.com" name='leetcode'/>
-          <Tile url="https://edu.lagou.com" name='拉钩'/>
-          <Tile url="developer.mozilla.org" name='MDN'/>
-          <Tile url="https://stackoverflow.com" name='stackoverflow'/>
-          <Tile url="taobao.com" name='taobao'/>
-          <Tile url="qq.com" name='QQ'/>
-          <Tile icon={ <MdAdd style={{ width: 40, height: 40}} />} name='add new' onClick={ openModal }/>
+          {
+            allUrl.map(({ name, url }) => (<Tile url={ url } name={ name } key={ url }/>))
+          }
+          
+          <Tile
+            icon={<MdAdd style={{ width: 40, height: 40 }} />}
+            name='Add Shortcut'
+            onClick={ () => setIsOpen(true) }
+          />
         </Stack>
       </main>
 
